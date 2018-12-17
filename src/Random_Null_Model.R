@@ -12,14 +12,13 @@
 ###nboot - number of random samples generated.
 ###num.genes - vector of number of genes for each sub-challenge on the 
 ###            DREAM Single Cell Trnascriptomic Challenge
-###dir.MCC.rand: Directory where to save MCC values
-###dir.vISH.rand: Directory where to save virtual InSitu Hybridization values
+###dir.random: Directory path where to save MCC and vISH values for the random model
+###            This is a subdirectory in the Data directory
 
 ##Output: saves MCC matrices for each random sample; also saves matrix of vISH 
 ##        mismatch for all random samples
 Random.null.model <- function( X.RNAseq, distmap.obj, nboot, num.genes, 
-                               dir.MCC.rand, 
-                               dir.vISH.rand){
+                               dir.random){
   library(DistMap)
   if( missing(nboot) ){
     nboot <- 100
@@ -38,7 +37,7 @@ Random.null.model <- function( X.RNAseq, distmap.obj, nboot, num.genes,
       dm.tmp <- mapCells(dm.tmp)
       dm.tmp@mcc.scores[is.nan(dm.tmp@mcc.scores)] <- 0
       # dir.results <- "/home/atheistpoet/Desktop/Work/Study/UIUC/Semester_1/CS598JP/Project/DREAM_single_cell/Data"
-      file <- paste(dir.MCC.rand, "/MCC_Subchallenge_", j, "_boot_", i, 
+      file <- paste(dir.random, "/MCC_Subchallenge_", j, "_boot_", i, 
                     ".RData", sep = "")
       MCC.rand <- dm.tmp@mcc.scores
       save(MCC.rand, file = file)
@@ -55,10 +54,11 @@ Random.null.model <- function( X.RNAseq, distmap.obj, nboot, num.genes,
       }
       mismatch.vISH.rnd[j, i, ] <- colMeans(mismatch.tmp)
       # dir.results <- "/home/atheistpoet/Desktop/Work/Study/UIUC/Semester_1/CS598JP/Project/DREAM_single_cell/Data"
-      file <- paste(dir.vISH.rand, "/mismatch_VFISH_random.RData", sep = "")
+      file <- paste(dir.random, "/mismatch_VFISH_random.RData", sep = "")
       save(mismatch.vISH.rnd, file = file)
     }
   }
+  return(1)
 }
 
 
@@ -66,13 +66,13 @@ Random.null.model <- function( X.RNAseq, distmap.obj, nboot, num.genes,
 
 ##Random.MCC.dist: Calculate average distance of top 10 MCC locations 
 ##random null model
-Random.MCC.dist <- function(X.RNAseq, dir.MCC.rand, dir.MCC.rand.dist, num.genes){
+Random.MCC.dist <- function(X.RNAseq, dir.random, dir.data, num.genes){
   for( j in 1:length(num.genes) ){
     mcc.dist.rand <- array(0, c(nboot, nrow(X.new)))
     for( b in 1:nboot ){
       cat("Num genes = ", num.genes[j], " boot loop = ", b, "\n")
       dir.results <- "/home/atheistpoet/Desktop/Work/Study/UIUC/Semester_1/CS598JP/Project/DREAM_single_cell/Data"
-      file <- paste(dir.MCC.rand, "/MCC_Subchallenge_", j, "_boot_", b,
+      file <- paste(dir.random, "/MCC_Subchallenge_", j, "_boot_", b,
                     ".RData", sep = "")
       load(file)
       id.rand <- apply(MCC.rand, 2, function(x){order(x, decreasing = T)[1:10]})
@@ -99,8 +99,9 @@ Random.MCC.dist <- function(X.RNAseq, dir.MCC.rand, dir.MCC.rand.dist, num.genes
       # mcc.corr.norm.rand[b, ] <- corr.maxmcc.rand
       
     }
-    file <- paste(dir.MCC.rand.dist, "/MCC_dist_rand_Subchallenge_", j, ".RData", 
+    file <- paste(dir.data, "/MCC_distance_random_model_Subchallenge_", j, ".RData", 
                   sep = "")
     save(mcc.dist.rand, file = file)
   }
+  return(1)
 }
