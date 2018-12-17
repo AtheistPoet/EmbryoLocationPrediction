@@ -261,7 +261,7 @@ Denoising.Autoencoder.Selection <- function( X.RNAseq, train.ratio,
 ##       its neural network has the expression for gene i clamped to zero, and if this 
 ##       is set to 'random', gene i's expression is randomly shuffled.
 ##adj.TRN - adjacency matrix for transcriptional regulatory network 
-##dir.TRN - path to file for name conversion between official gene symbol and 
+##dir.data - path to data directory which has the file for name conversion between official gene symbol and 
 ##         flybase ids
 ##id.TF - position of driver genes in the adjacency matrix
 
@@ -273,7 +273,7 @@ Denoising.Autoencoder.Selection.TF <- function( X.RNAseq, train.ratio,
                                              batch_size, batch_size_val, 
                                              epochs, verbose, 
                                              activation, 
-                                             Type, adj.TRN, dir.TRN){
+                                             Type, adj.TRN, dir.data){
   library(keras)
   if( missing(train.ratio) ){
     train.ratio <- 0.7
@@ -308,7 +308,7 @@ Denoising.Autoencoder.Selection.TF <- function( X.RNAseq, train.ratio,
   test.ratio <- 1 - train.ratio - val.ratio
   
   # dir.TRN <- "/home/atheistpoet/Desktop/Work/Study/UIUC/Semester_1/CS598JP/Project/DREAM_single_cell/Data"
-  file <- paste(dir.TRN, "/DAVID_gene_DREAM_84_name_to_flybase.txt", sep = "")
+  file <- paste(dir.data, "/DAVID_gene_DREAM_84_name_to_flybase.txt", sep = "")
   gene.to.flybase <- read.table(file, sep = "\t", header = T)
   
   names.flybase <- gene.to.flybase[which(gene.to.flybase$From != "D" & 
@@ -320,10 +320,10 @@ Denoising.Autoencoder.Selection.TF <- function( X.RNAseq, train.ratio,
     gene.to.flybase[
       which(gene.to.flybase == "trn")[2], ])
   
-  id.DREAM.fly <- match(colnames(X.new), names.flybase$From)
+  id.DREAM.fly <- match(colnames(X.RNAseq), names.flybase$From)
   DREAM.flybase <- as.character(names.flybase$To[id.DREAM.fly[!is.na(id.DREAM.fly)]])
   
-  id.match <- match(DREAM.flybase, Genes.TRN.list[[og]])
+  id.match <- match(DREAM.flybase, colnames(adj.TRN))
   
   adj.DA <- adj.TRN[id.match[!is.na(id.match)], 
                     id.match[!is.na(id.match)]]
@@ -431,7 +431,7 @@ Denoising.Autoencoder.Selection.TF <- function( X.RNAseq, train.ratio,
     layer_dense(units = 234, activation = activation, 
                 kernel_regularizer = regularizer_l2(l = 0.001), 
                 name = paste("output_", i + 1, sep = ""))
-  output <- layer_concatenate(output_hidden) %>% layer_dense(units = ncol(X.new))
+  output <- layer_concatenate(output_hidden) %>% layer_dense(units = ncol(X.RNAseq))
   
   for( i in 1:length(input) ){
     if( i == 1 ){
