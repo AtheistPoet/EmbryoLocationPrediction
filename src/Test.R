@@ -151,7 +151,7 @@ i <- 1
 # dir.random <- <add path to 'random' directory, which is a subdirectory under 
 #                 data directory>
 # tmp <- Random.null.model(X.RNAseq, dm, nboot, num.genes, dir.random)
-# tmp <- Random.MCC.dist(X.RNAseq, dir.random, dir.data, num.genes)
+# tmp <- Random.MCC.dist(X.RNAseq, dir.random, dir.data, num.genes, nboot)
 ###END:Random Null Model
 
 
