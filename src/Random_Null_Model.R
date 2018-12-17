@@ -66,7 +66,7 @@ Random.null.model <- function( X.RNAseq, distmap.obj, nboot, num.genes,
 
 ##Random.MCC.dist: Calculate average distance of top 10 MCC locations 
 ##random null model
-Random.MCC.dist <- function(X.RNAseq, dir.random, dir.data, num.genes){
+Random.MCC.dist <- function(X.RNAseq, dir.random, dir.data, num.genes, nboot){
   for( j in 1:length(num.genes) ){
     mcc.dist.rand <- array(0, c(nboot, nrow(X.new)))
     for( b in 1:nboot ){
