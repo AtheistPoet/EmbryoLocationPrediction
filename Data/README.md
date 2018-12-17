@@ -16,3 +16,5 @@ The details of all the data files is as follows:
 7) dge_raw.txt -- raw single-cell RNAseq data for all genes (8924).
 
 8) geometry.txt -- geometry file containing the x, y, z coordinates for locations on the embryo.
+
+The directory also contains a subdirectory 'Methods' that has pre-computed gene list for all methods in (decreasing order of importance for cellular location prediction).
